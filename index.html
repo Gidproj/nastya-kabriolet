@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Для Насти — Ленинград «Кабриолет»</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #F1ECE1;
+      --bg-outer: #E4DDD0;
+      --text-olive: #424A26;
+      --text-dark: #1E1E1C;
+      --player-bg: rgba(128, 128, 128, 0.90);
+      --player-border: rgba(255, 255, 255, 0.28);
+      --accent-red: #B81D24;
+      --accent-gold: #F59E0B;
+      --beat-scale: 1;
+      --beat-glow: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      min-height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 45%, #F7F4EC 0%, var(--bg-cream) 55%, var(--bg-outer) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Soft ambient glow that pulses to the music */
+    .ambient-glow {
+      position: absolute;
+      width: 680px;
+      height: 440px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(215, 45, 45, 0.22) 0%, rgba(245, 158, 11, 0.14) 45%, transparent 72%);
+      filter: blur(45px);
+      z-index: 1;
+      pointer-events: none;
+      opacity: calc(0.15 + var(--beat-glow) * 0.85);
+      transform: scale(calc(0.95 + var(--beat-glow) * 0.25));
+      transition: opacity 0.08s ease-out, transform 0.08s ease-out;
+    }
+
+    /* Main Card Stage (matches the reference layout) */
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      max-width: 1600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+      z-index: 2;
+    }
+
+    /* Top Minimalist Header (like Almond Milk reference) */
+    .top-nav {
+      position: absolute;
+      top: 32px;
+      left: 48px;
+      right: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 30;
+    }
+
+    .brand-icon {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dark);
+      opacity: 0.85;
+    }
+
+    .brand-icon svg {
+      width: 28px;
+      height: 28px;
+      transition: transform 0.3s ease;
+    }
+
+    .brand-icon:hover svg {
+      transform: rotate(-12deg) scale(1.1);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 44px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-dark);
+      letter-spacing: -0.01em;
+    }
+
+    .nav-links span {
+      cursor: pointer;
+      position: relative;
+      opacity: 0.78;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .nav-links span:hover,
+    .nav-links span.active {
+      opacity: 1;
+    }
+
+    .nav-links span::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 0%;
+      height: 1.5px;
+      background: var(--text-olive);
+      transition: width 0.25s ease;
+    }
+
+    .nav-links span:hover::after,
+    .nav-links span.active::after {
+      width: 100%;
+    }
+
+    .nav-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(30, 30, 28, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(6px);
+    }
+
+    .nav-badge:hover {
+      transform: scale(1.08);
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    /* Giant Background Text "ЛЕНИНГРАД" (like "Almond" on the reference) */
+    .bg-title-wrap {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -54%);
+      width: 100%;
+      text-align: center;
+      z-index: 4;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Soft blurred shadow duplicate of text like in the Almond reference */
+    .bg-title-ghost {
+      position: absolute;
+      font-family: 'Inter', sans-serif;
+      font-weight: 900;
+      font-size: clamp(72px, 13.8vw, 220px);
+      letter-spacing: 0.04em;
+      color: rgba(66, 74, 38, 0.16);
+      filter: blur(8px);
+      transform: translate(-14px, -4px) scale(1.02);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .bg-title {
+      position: relative;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: clamp(72px, 13.8vw, 220px);
+      letter-spacing: 0.04em;
+      color: var(--text-olive);
+      white-space: nowrap;
+      line-height: 1;
+      display: flex;
+      gap: 0.03em;
+      transition: transform 0.1s ease-out;
+      transform: scale(calc(1 + var(--beat-glow) * 0.022));
+    }
+
+    .bg-title .char {
+      display: inline-block;
+      transition: transform 0.12s ease-out, color 0.2s ease;
+    }
+
+    /* Scattered Mini Cabriolets Layer (Replacing Almonds) */
+    .cabriolets-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    .mini-cabrio {
+      position: absolute;
+      pointer-events: auto;
+      cursor: pointer;
+      will-change: transform;
+      transition: filter 0.25s ease;
+    }
+
+    .mini-cabrio img {
+      display: block;
+      width: 100%;
+      height: auto;
+      filter: drop-shadow(0 18px 24px rgba(35, 25, 20, 0.26));
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .mini-cabrio:hover img {
+      transform: scale(1.12) rotate(-3deg);
+    }
+
+    .mini-cabrio:active img {
+      transform: scale(0.95);
+    }
+
+    /* Positions matching the Almond Milk reference:
+       1. Large foreground left (overlapping the first letter, slight depth blur)
+       2. Upper left-center floating tilted
+       3. Top right-center peeking down
+       4. Far right large foreground overlapping last letter
+       5. Bottom left-center soft blurred out-of-focus
+       6. Bottom right-center floating
+    */
+    .cabrio-1 {
+      left: -2%;
+      top: 47%;
+      width: clamp(190px, 21vw, 320px);
+      z-index: 18;
+      --rot: -18deg;
+      --depth: 42;
+      --blur: 1.4px;
+      --float-dur: 5.4s;
+      --float-delay: 0s;
+    }
+
+    .cabrio-2 {
+      left: 24%;
+      top: 13%;
+      width: clamp(135px, 13.5vw, 205px);
+      z-index: 16;
+      --rot: 22deg;
+      --depth: 26;
+      --blur: 0px;
+      --float-dur: 4.8s;
+      --float-delay: -1.2s;
+    }
+
+    .cabrio-3 {
+      right: 21%;
+      top: 10%;
+      width: clamp(130px, 12.5vw, 190px);
+      z-index: 6;
+      --rot: -24deg;
+      --depth: 18;
+      --blur: 0.4px;
+      --float-dur: 5.8s;
+      --float-delay: -2.5s;
+    }
+
+    .cabrio-4 {
+      right: -3%;
+      top: 41%;
+      width: clamp(200px, 22vw, 340px);
+      z-index: 18;
+      --rot: 16deg;
+      --depth: 46;
+      --blur: 1.8px;
+      --float-dur: 5.1s;
+      --float-delay: -0.7s;
+    }
+
+    .cabrio-5 {
+      left: 23%;
+      bottom: 13%;
+      width: clamp(115px, 11vw, 165px);
+      z-index: 5;
+      --rot: -12deg;
+      --depth: 15;
+      --blur: 3.2px;
+      opacity: 0.82;
+      --float-dur: 6.2s;
+      --float-delay: -3.1s;
+    }
+
+    .cabrio-6 {
+      right: 23%;
+      bottom: 12%;
+      width: clamp(130px, 12.5vw, 190px);
+      z-index: 17;
+      --rot: -19deg;
+      --depth: 30;
+      --blur: 0.8px;
+      --float-dur: 4.9s;
+      --float-delay: -1.8s;
+    }
+
+    .mini-cabrio-inner {
+      animation: floatCabrio var(--float-dur, 5s) ease-in-out infinite alternate;
+      animation-delay: var(--float-delay, 0s);
+      filter: blur(var(--blur, 0px));
+    }
+
+    @keyframes floatCabrio {
+      0% {
+        transform: translateY(0px) rotate(var(--rot, 0deg));
+      }
+      100% {
+        transform: translateY(-14px) rotate(calc(var(--rot, 0deg) + 5deg));
+      }
+    }
+
+    /* When music plays, mini cabriolets bounce to the beat */
+    body.is-playing .mini-cabrio img {
+      transform: scale(calc(1 + var(--beat-glow) * 0.085)) rotate(calc(var(--beat-glow) * -3deg));
+    }
+
+    /* Centerpiece Wrapper (Player + Side Arrows + Shadow + Bottom Pill) */
+    .centerpiece {
+      position: relative;
+      z-index: 12;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    /* Navigation Circles Left/Right like on the reference (< >) */
+    .player-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .side-arrow {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: none;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 25;
+      color: #222;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .side-arrow:hover {
+      transform: scale(1.14);
+      background: #FFFDF9;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+    }
+
+    .side-arrow:active {
+      transform: scale(0.94);
+    }
+
+    .side-arrow.left {
+      left: -20px;
+    }
+
+    .side-arrow.right {
+      right: -20px;
+    }
+
+    .side-arrow svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.5;
+    }
+
+    /* iOS Widget Style Music Player (Exact match to attached player reference) */
+    .ios-player {
+      position: relative;
+      width: min(550px, 90vw);
+      min-height: 312px;
+      background: linear-gradient(145deg, rgba(136, 136, 136, 0.93) 0%, rgba(114, 114, 114, 0.91) 100%);
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      border-radius: 38px;
+      padding: 23px 26px 22px 23px;
+      display: grid;
+      grid-template-columns: 244px 1fr;
+      gap: 24px;
+      box-shadow:
+        0 26px 50px rgba(32, 28, 22, 0.24),
+        0 6px 16px rgba(0, 0, 0, 0.12),
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.35),
+        inset 0 -1.5px 2px rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      transform: scale(calc(1 + var(--beat-glow) * 0.016));
+      transition: transform 0.09s ease-out, box-shadow 0.25s ease;
+    }
+
+    body.is-playing .ios-player {
+      box-shadow:
+        0 30px 60px rgba(184, 29, 36, 0.22),
+        0 10px 24px rgba(0, 0, 0, 0.16),
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.42);
+    }
+
+    /* Left Square Album Art Cutout */
+    .album-frame {
+      position: relative;
+      width: 244px;
+      height: 264px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #0d0d0d;
+      box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.32),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+    }
+
+    .album-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    body.is-playing .album-frame img {
+      transform: scale(calc(1.02 + var(--beat-glow) * 0.04));
+    }
+
+    /* Subtle vinyl shine / equalizer badge on album art */
+    .album-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 65%, rgba(0,0,0,0.45) 100%);
+      pointer-events: none;
+    }
+
+    .eq-bars {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 16px;
+      padding: 3px 6px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    body.is-playing .eq-bars {
+      opacity: 1;
+    }
+
+    .eq-bar {
+      width: 3px;
+      height: 4px;
+      background: #F59E0B;
+      border-radius: 2px;
+      transition: height 0.07s ease;
+    }
+
+    /* Right Controls Column inside iOS Player */
+    .player-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 6px 2px 0 0;
+      color: #FFFFFF;
+      min-width: 0;
+    }
+
+    /* Top Row: Custom Message (replacing "iPhone") + AirPlay Icon */
+    .player-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .player-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .player-custom-title {
+      font-size: 16.5px;
+      font-weight: 700;
+      line-height: 1.22;
+      color: #FFFFFF;
+      letter-spacing: -0.015em;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+    }
+
+    .player-subtitle {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.76);
+      letter-spacing: 0.01em;
+    }
+
+    .airplay-btn {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      cursor: pointer;
+      opacity: 0.92;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .airplay-btn:hover {
+      transform: scale(1.12);
+      opacity: 1;
+    }
+
+    body.is-playing .airplay-btn svg {
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+    }
+
+    /* Progress Bar Section */
+    .progress-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .slider-track {
+      position: relative;
+      width: 100%;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .slider-line {
+      width: 100%;
+      height: 3.5px;
+      background: rgba(255, 255, 255, 0.42);
+      border-radius: 99px;
+      position: relative;
+      overflow: visible;
+    }
+
+    .slider-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0%;
+      background: #FFFFFF;
+      border-radius: 99px;
+    }
+
+    .slider-thumb {
+      position: absolute;
+      top: 50%;
+      left: 0%;
+      width: 11px;
+      height: 11px;
+      background: #FFFFFF;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+      transition: transform 0.15s ease;
+    }
+
+    .slider-track:hover .slider-thumb {
+      transform: translate(-50%, -50%) scale(1.3);
+    }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.95);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.01em;
+    }
+
+    /* Playback Transport Buttons (<<  Play/Pause  >>) */
+    .transport-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 44px;
+      margin: 2px 0;
+    }
+
+    .transport-btn {
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 50%;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.18s ease;
+    }
+
+    .transport-btn:hover {
+      transform: scale(1.14);
+    }
+
+    .transport-btn:active {
+      transform: scale(0.9);
+    }
+
+    .play-pause-btn {
+      width: 52px;
+      height: 52px;
+      position: relative;
+    }
+
+    /* Pulse ring on play button before user clicks */
+    body:not(.is-playing) .play-pause-btn::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.55);
+      animation: pulsePlay 1.8s infinite ease-out;
+    }
+
+    @keyframes pulsePlay {
+      0% { transform: scale(0.85); opacity: 0.9; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+
+    /* Volume Bar Row */
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .vol-icon {
+      color: rgba(255, 255, 255, 0.92);
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Bottom White Home Indicator Bar inside Player */
+    .home-bar-wrap {
+      display: flex;
+      justify-content: center;
+      padding-top: 8px;
+    }
+
+    .home-bar {
+      width: 118px;
+      height: 4.5px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 99px;
+    }
+
+    /* Ground Drop Shadow beneath the player (like beneath the bottle in reference) */
+    .ground-shadow {
+      width: 78%;
+      height: 26px;
+      background: radial-gradient(ellipse at center, rgba(40, 35, 25, 0.28) 0%, rgba(40, 35, 25, 0.08) 55%, transparent 75%);
+      margin-top: -6px;
+      filter: blur(6px);
+      pointer-events: none;
+      transition: transform 0.1s ease-out;
+      transform: scaleX(calc(1 + var(--beat-glow) * 0.05));
+    }
+
+    /* Synchronized Lyrics Pill (appears above or below player when playing) */
+    .lyrics-pill {
+      margin-top: 14px;
+      min-height: 32px;
+      padding: 6px 18px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(66, 74, 38, 0.15);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-olive);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .lyrics-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-red);
+      display: inline-block;
+    }
+
+    body.is-playing .lyrics-dot {
+      animation: blinkDot 0.8s infinite alternate;
+    }
+
+    @keyframes blinkDot {
+      from { transform: scale(0.8); opacity: 0.6; }
+      to { transform: scale(1.3); opacity: 1; }
+    }
+
+    /* Bottom "Shop now" style CTA Button from Reference */
+    .cta-btn {
+      margin-top: 16px;
+      padding: 11px 28px;
+      border-radius: 999px;
+      background: #FFFFFF;
+      color: var(--text-dark);
+      font-size: 13.5px;
+      font-weight: 700;
+      border: 1.5px solid #1E1E1C;
+      box-shadow: 0 4px 0 #1E1E1C, 0 8px 20px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+      z-index: 25;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #1E1E1C, 0 12px 24px rgba(0, 0, 0, 0.14);
+      background: #FFFDF8;
+    }
+
+    .cta-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #1E1E1C;
+    }
+
+    /* Floating Particle Canvas for Music Notes / Hearts / Sparks */
+    #fx-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    /* Personal Greeting Card Modal for Nastya */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 22, 18, 0.45);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .letter-card {
+      background: #FBF8F1;
+      border: 2px solid #1E1E1C;
+      box-shadow: 0 12px 0 #1E1E1C, 0 24px 60px rgba(0,0,0,0.25);
+      border-radius: 28px;
+      max-width: 460px;
+      width: 100%;
+      padding: 32px 30px 28px;
+      position: relative;
+      transform: translateY(20px) scale(0.95);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-align: center;
+    }
+
+    .modal-backdrop.open .letter-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .letter-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1.5px solid #1E1E1C;
+      background: #FFF;
+      cursor: pointer;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .letter-car-img {
+      width: 150px;
+      margin: -10px auto 10px;
+      display: block;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,0.2));
+    }
+
+    .letter-heading {
+      font-family: 'Caveat', cursive;
+      font-size: 36px;
+      color: var(--accent-red);
+      margin-bottom: 10px;
+      line-height: 1.1;
+    }
+
+    .letter-body {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #2C2C2A;
+      margin-bottom: 20px;
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 700px) {
+      .top-nav {
+        top: 18px;
+        left: 20px;
+        right: 20px;
+      }
+      .nav-links {
+        display: none;
+      }
+      .ios-player {
+        grid-template-columns: 1fr;
+        width: min(360px, 88vw);
+        padding: 18px;
+        gap: 16px;
+      }
+      .album-frame {
+        width: 100%;
+        height: 220px;
+      }
+      .cabrio-1 { width: 130px; top: 58%; left: -6%; }
+      .cabrio-4 { width: 140px; top: 55%; right: -6%; }
+      .cabrio-2 { width: 110px; top: 8%; left: 8%; }
+      .cabrio-3 { width: 100px; top: 7%; right: 8%; }
+      .cabrio-5, .cabrio-6 { width: 105px; bottom: 5%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pulse Glow behind player -->
+  <div class="ambient-glow"></div>
+
+  <!-- Particle Canvas for Musical Notes & Confetti -->
+  <canvas id="fx-canvas"></canvas>
+
+  <main class="stage" id="stage">
+    <!-- Reference-style Minimalist Top Navigation -->
+    <header class="top-nav">
+      <div class="brand-icon" title="Кабриолет Тур">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 19l2.5-6.5A2 2 0 0 1 7.4 11h10.2l3.4 4h6a2 2 0 0 1 2 2v2a1 1 0 0 1-1 1h-2" />
+          <line x1="11" y1="20" x2="21" y2="20" />
+          <circle cx="8" cy="20" r="3" fill="currentColor" />
+          <circle cx="24" cy="20" r="3" fill="currentColor" />
+        </svg>
+        <span>КАБРИОЛЕТ</span>
+      </div>
+
+      <nav class="nav-links">
+        <span class="active" id="nav-play">Песня</span>
+        <span id="nav-honk">Сигнал 🚗</span>
+        <span id="nav-turbo">Турбо-режим</span>
+        <span id="nav-letter">Для Насти ❤️</span>
+      </nav>
+
+      <button class="nav-badge" id="btn-confetti" title="Запустить салют для Насти">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Giant Background Text "ЛЕНИНГРАД" (Almond Milk Reference Style) -->
+    <div class="bg-title-wrap" id="bg-title-wrap">
+      <div class="bg-title-ghost" aria-hidden="true">ЛЕНИНГРАД</div>
+      <h1 class="bg-title" id="bg-title">
+        <span class="char">Л</span><span class="char">Е</span><span class="char">Н</span><span class="char">И</span><span class="char">Н</span><span class="char">Г</span><span class="char">Р</span><span class="char">А</span><span class="char">Д</span>
+      </h1>
+    </div>
+
+    <!-- Scattered Mini Cabriolets (Replacing Floating Almonds) -->
+    <div class="cabriolets-layer" id="cabriolets-layer">
+      <!-- 1. Left Foreground Large Cabriolet -->
+      <div class="mini-cabrio cabrio-1" data-depth="38" title="Нажми на кабриолет!">
+        <div class="mini-cabrio-inner">
+          <img src="assets/cabriolet_main.png" alt="Мини кабриолет" />
+        </div>
+      </div>
+
+      <!-- 2. Top-Left Floating Cabriolet -->
+      <div class="mini-cabrio cabrio-2" data-depth="24" title="Нажми на кабриолет!">
+        <div class="mini-cabrio-inner">
+          <img src="assets/cabriolet_side.png" alt="Мини кабриолет" />
+        </div>
+      </div>
+
+      <!-- 3. Top-Right Floating Cabriolet -->
+      <div class="mini-cabrio cabrio-3" data-depth="18" title="Нажми на кабриолет!">
+        <div class="mini-cabrio-inner">
+          <img src="assets/cabriolet_flipped.png" alt="Мини кабриолет" />
+        </div>
+      </div>
+
+      <!-- 4. Right Foreground Large Cabriolet -->
+      <div class="mini-cabrio cabrio-4" data-depth="42" title="Нажми на кабриолет!">
+        <div class="mini-cabrio-inner">
+          <img src="assets/cabriolet_flipped.png" alt="Мини кабриолет" />
+        </div>
+      </div>
+
+      <!-- 5. Bottom-Left Blurred Cabriolet -->
+      <div class="mini-cabrio cabrio-5" data-depth="14" title="Нажми на кабриолет!">
+        <div class="mini-cabrio-inner">
+          <img src="assets/cabriolet_3q.png" alt="Мини кабриолет" />
+        </div>
+      </div>
+
+      <!-- 6. Bottom-Right Floating Cabriolet -->
+      <div class="mini-cabrio cabrio-6" data-depth="28" title="Нажми на кабриолет!">
+        <div class="mini-cabrio-inner">
+          <img src="assets/cabriolet_main.png" alt="Мини кабриолет" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Centerpiece: iOS Music Player Widget + Reference Controls -->
+    <div class="centerpiece">
+      <div class="player-row">
+        <!-- Left Circle Arrow (<) from Almond Milk reference -->
+        <button class="side-arrow left" id="arrow-prev" title="Перемотать назад">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <!-- Attached iOS Widget Player with Album Cover & Custom Text -->
+        <div class="ios-player" id="ios-player">
+          <!-- Left: Album Art (Ленинград — Кабриолет) -->
+          <div class="album-frame" id="album-frame" title="Включить / Пауза">
+            <img src="assets/cover.jpg" alt="Ленинград — Кабриолет" />
+            <div class="album-overlay"></div>
+            <div class="eq-bars" id="eq-bars">
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+            </div>
+          </div>
+
+          <!-- Right: Controls & Custom Caption -->
+          <div class="player-right">
+            <div class="player-top-row">
+              <div class="player-title-wrap">
+                <div class="player-custom-title">
+                  Настя как хорошо, что ты меня тогда нашла
+                </div>
+                <div class="player-subtitle">Ленинград — Кабриолет</div>
+              </div>
+
+              <!-- AirPlay Icon from the player reference -->
+              <button class="airplay-btn" id="airplay-btn" title="Анимация звука">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path d="M6.3 15.7a8 8 0 1 1 11.4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M8.8 13.2a4.5 4.5 0 1 1 6.4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="12" cy="10.5" r="1.5" fill="currentColor"/>
+                  <path d="M12 13.5L7.5 20.5h9L12 13.5z" fill="currentColor"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Scrubber / Progress Bar -->
+            <div class="progress-section">
+              <div class="slider-track" id="progress-track">
+                <div class="slider-line">
+                  <div class="slider-fill" id="progress-fill" style="width: 0%;"></div>
+                  <div class="slider-thumb" id="progress-thumb" style="left: 0%;"></div>
+                </div>
+              </div>
+              <div class="time-row">
+                <span id="time-current">0:00</span>
+                <span id="time-total">2:42</span>
+              </div>
+            </div>
+
+            <!-- Transport Controls: Rewind, Play/Pause, Fast-Forward -->
+            <div class="transport-row">
+              <button class="transport-btn" id="btn-rewind" title="-10 сек">
+                <svg width="32" height="24" viewBox="0 0 32 24" fill="currentColor">
+                  <path d="M15 4L3 12l12 8V4zm13 0L16 12l12 8V4z"/>
+                </svg>
+              </button>
+
+              <button class="transport-btn play-pause-btn" id="btn-play" title="Включить песню">
+                <!-- Play Icon (default before playing) -->
+                <svg id="icon-play" width="38" height="38" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 4.5v15l12-7.5-12-7.5z"/>
+                </svg>
+                <!-- Pause Icon (shown while playing, matching the reference) -->
+                <svg id="icon-pause" width="38" height="38" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                  <rect x="6" y="4" width="4.5" height="16" rx="1.2"/>
+                  <rect x="13.5" y="4" width="4.5" height="16" rx="1.2"/>
+                </svg>
+              </button>
+
+              <button class="transport-btn" id="btn-forward" title="+10 сек">
+                <svg width="32" height="24" viewBox="0 0 32 24" fill="currentColor">
+                  <path d="M4 4l12 8-12 8V4zm13 0l12 8-12 8V4z"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Volume Slider Row -->
+            <div class="volume-row">
+              <span class="vol-icon" id="vol-mute" title="Тихо">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 9v6h4l5 5V4l-5 5H7z"/>
+                </svg>
+              </span>
+              <div class="slider-track" id="volume-track">
+                <div class="slider-line">
+                  <div class="slider-fill" id="volume-fill" style="width: 85%;"></div>
+                  <div class="slider-thumb" id="volume-thumb" style="left: 85%;"></div>
+                </div>
+              </div>
+              <span class="vol-icon" id="vol-max" title="Громко">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+              </span>
+            </div>
+
+            <!-- Bottom White Pill Bar -->
+            <div class="home-bar-wrap">
+              <div class="home-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Circle Arrow (>) from Almond Milk reference -->
+        <button class="side-arrow right" id="arrow-next" title="Припев «Кабриолет»">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Soft Ground Shadow under Player -->
+      <div class="ground-shadow"></div>
+
+      <!-- Live Lyrics / Status Pill -->
+      <div class="lyrics-pill" id="lyrics-pill">
+        <span class="lyrics-dot"></span>
+        <span id="lyrics-text">Нажми Play — и погнали в кабриолете! 🕶️✨</span>
+      </div>
+
+      <!-- Bottom Pill CTA Button (matching "Shop now" on the Almond Milk reference) -->
+      <button class="cta-btn" id="cta-open-card">
+        <span>Открыть послание для Насти</span>
+        <span>💌</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- Greeting Modal for Nastya -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="letter-card">
+      <button class="letter-close" id="modal-close" title="Закрыть">✕</button>
+      <img src="assets/cabriolet_main.png" alt="Кабриолет" class="letter-car-img" />
+      <h2 class="letter-heading">Настя, как хорошо, что ты меня тогда нашла!</h2>
+      <p class="letter-body">
+        Пусть наша жизнь мчится ярко, весело и с ветерком — прямо как в этом красном кабриолете под «Ленинград»! Спасибо за каждую минуту, за наш драйв, смех и самые крутые приключения вместе! ❤️🔥
+      </p>
+      <button class="cta-btn" id="modal-play-chorus" style="margin-top: 0;">
+        <span>Врубить припев на полную! 🎶</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Audio Element: Ленинград — Кабриолет -->
+  <audio id="audio" src="assets/kabriolet.mp3" preload="auto"></audio>
+
+  <script>
+    const audio = document.getElementById('audio');
+    const btnPlay = document.getElementById('btn-play');
+    const albumFrame = document.getElementById('album-frame');
+    const iconPlay = document.getElementById('icon-play');
+    const iconPause = document.getElementById('icon-pause');
+    const btnRewind = document.getElementById('btn-rewind');
+    const btnForward = document.getElementById('btn-forward');
+    const arrowPrev = document.getElementById('arrow-prev');
+    const arrowNext = document.getElementById('arrow-next');
+    const progressTrack = document.getElementById('progress-track');
+    const progressFill = document.getElementById('progress-fill');
+    const progressThumb = document.getElementById('progress-thumb');
+    const timeCurrent = document.getElementById('time-current');
+    const timeTotal = document.getElementById('time-total');
+    const volumeTrack = document.getElementById('volume-track');
+    const volumeFill = document.getElementById('volume-fill');
+    const volumeThumb = document.getElementById('volume-thumb');
+    const volMute = document.getElementById('vol-mute');
+    const volMax = document.getElementById('vol-max');
+    const lyricsText = document.getElementById('lyrics-text');
+    const eqBars = document.querySelectorAll('.eq-bar');
+    const titleChars = document.querySelectorAll('.bg-title .char');
+    const cabrios = document.querySelectorAll('.mini-cabrio');
+
+    // Web Audio API Analyzer for real-time beat animations
+    let audioCtx = null;
+    let analyser = null;
+    let dataArray = null;
+    let isAudioSetup = false;
+    let turboMode = false;
+
+    function initAudioAnalyser() {
+      if (isAudioSetup) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+        const source = audioCtx.createMediaElementSource(audio);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 128;
+        analyser.smoothingTimeConstant = 0.78;
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        isAudioSetup = true;
+      } catch (e) {
+        console.warn('Web Audio API fallback mode:', e);
+      }
+    }
+
+    function formatTime(sec) {
+      if (!isFinite(sec) || sec < 0) return '0:00';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    audio.volume = 0.85;
+
+    audio.addEventListener('loadedmetadata', () => {
+      timeTotal.textContent = formatTime(audio.duration);
+    });
+
+    // Synchronized lyrics & mood lines for Ленинград — Кабриолет
+    const lyricCues = [
+      { t: 0, text: '🎸 Вступление — заводим мотор кабриолета!' },
+      { t: 14, text: '✨ Настя, как хорошо, что ты меня тогда нашла!' },
+      { t: 30, text: '🚗 «А я сяду в кабриолет и уеду куда-нибудь...»' },
+      { t: 45, text: '🔥 Поём вместе на всю громкость!' },
+      { t: 62, text: '💃 «Кабриолет! Всё идёт по плану!»' },
+      { t: 90, text: '🥂 За лучшую встречу в жизни!' },
+      { t: 120, text: '🌟 Ветер в волосах и любимая песня!' }
+    ];
+
+    audio.addEventListener('timeupdate', () => {
+      if (!audio.duration) return;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      progressFill.style.width = pct + '%';
+      progressThumb.style.left = pct + '%';
+      timeCurrent.textContent = formatTime(audio.currentTime);
+
+      // Update lyric cue
+      let activeCue = lyricCues[0].text;
+      for (const cue of lyricCues) {
+        if (audio.currentTime >= cue.t) activeCue = cue.text;
+      }
+      if (!audio.paused && lyricsText.textContent !== activeCue) {
+        lyricsText.textContent = activeCue;
+      }
+    });
+
+    function togglePlay() {
+      initAudioAnalyser();
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }
+
+    audio.addEventListener('play', () => {
+      document.body.classList.add('is-playing');
+      iconPlay.style.display = 'none';
+      iconPause.style.display = 'block';
+      spawnBurst(window.innerWidth / 2, window.innerHeight / 2, 18);
+    });
+
+    audio.addEventListener('pause', () => {
+      document.body.classList.remove('is-playing');
+      iconPlay.style.display = 'block';
+      iconPause.style.display = 'none';
+      document.documentElement.style.setProperty('--beat-glow', '0');
+      lyricsText.textContent = 'Пауза — нажми Play, чтобы продолжить гонку! 🚗';
+    });
+
+    audio.addEventListener('ended', () => {
+      document.body.classList.remove('is-playing');
+      iconPlay.style.display = 'block';
+      iconPause.style.display = 'none';
+      document.documentElement.style.setProperty('--beat-glow', '0');
+      lyricsText.textContent = 'Настя, ты лучшая! Повторим поездку? ❤️';
+    });
+
+    btnPlay.addEventListener('click', togglePlay);
+    albumFrame.addEventListener('click', togglePlay);
+    document.getElementById('nav-play').addEventListener('click', togglePlay);
+
+    // Seek bar interaction
+    function seekFromEvent(e) {
+      const rect = progressTrack.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      if (audio.duration) {
+        audio.currentTime = ratio * audio.duration;
+      }
+    }
+
+    let isDraggingProgress = false;
+    progressTrack.addEventListener('pointerdown', (e) => {
+      isDraggingProgress = true;
+      seekFromEvent(e);
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (isDraggingProgress) seekFromEvent(e);
+      if (isDraggingVolume) volumeFromEvent(e);
+    });
+    window.addEventListener('pointerup', () => {
+      isDraggingProgress = false;
+      isDraggingVolume = false;
+    });
+
+    // Volume bar interaction
+    let isDraggingVolume = false;
+    function setVolume(val) {
+      const v = Math.max(0, Math.min(1, val));
+      audio.volume = v;
+      volumeFill.style.width = (v * 100) + '%';
+      volumeThumb.style.left = (v * 100) + '%';
+    }
+    function volumeFromEvent(e) {
+      const rect = volumeTrack.getBoundingClientRect();
+      setVolume((e.clientX - rect.left) / rect.width);
+    }
+    volumeTrack.addEventListener('pointerdown', (e) => {
+      isDraggingVolume = true;
+      volumeFromEvent(e);
+    });
+    volMute.addEventListener('click', () => setVolume(0));
+    volMax.addEventListener('click', () => setVolume(1));
+
+    // Skip & Chorus Buttons
+    btnRewind.addEventListener('click', () => {
+      audio.currentTime = Math.max(0, audio.currentTime - 10);
+    });
+    btnForward.addEventListener('click', () => {
+      audio.currentTime = Math.min(audio.duration || 162, audio.currentTime + 10);
+    });
+    arrowPrev.addEventListener('click', () => {
+      audio.currentTime = 0;
+      if (audio.paused) togglePlay();
+    });
+    arrowNext.addEventListener('click', () => {
+      // Jump straight to energetic chorus (~30s)
+      audio.currentTime = 30;
+      if (audio.paused) togglePlay();
+      spawnBurst(window.innerWidth / 2, window.innerHeight / 2, 24);
+    });
+
+    // Cute Car Horn Sound Synthesizer (Web Audio API) when clicking mini cabriolets
+    function playBeep() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = audioCtx || new AudioContext();
+        const now = ctx.currentTime;
+        [440, 554.37].forEach((freq) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.19);
+        });
+      } catch (e) {}
+    }
+
+    cabrios.forEach((cab) => {
+      cab.addEventListener('click', (e) => {
+        playBeep();
+        const rect = cab.getBoundingClientRect();
+        spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 14);
+      });
+    });
+
+    document.getElementById('nav-honk').addEventListener('click', () => {
+      playBeep();
+      setTimeout(playBeep, 210);
+      spawnBurst(window.innerWidth / 2, window.innerHeight * 0.35, 22);
+    });
+
+    document.getElementById('nav-turbo').addEventListener('click', (e) => {
+      turboMode = !turboMode;
+      e.target.classList.toggle('active', turboMode);
+      if (audio.paused) togglePlay();
+      spawnBurst(window.innerWidth / 2, window.innerHeight / 2, 30);
+    });
+
+    // Mouse 3D Parallax for Cabriolets & Background Title
+    let mouseX = 0, mouseY = 0;
+    let currentX = 0, currentY = 0;
+    window.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    // Particle System (Notes, Hearts, Gold Sparks)
+    const canvas = document.getElementById('fx-canvas');
+    const ctx2d = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const symbols = ['♪', '♫', '❤️', '✨', '🔥'];
+
+    function spawnBurst(x, y, count = 16) {
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+        const speed = 2 + Math.random() * 5.5;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 1.8,
+          size: 14 + Math.random() * 12,
+          alpha: 1,
+          rot: (Math.random() - 0.5) * 0.6,
+          vRot: (Math.random() - 0.5) * 0.04,
+          symbol: symbols[Math.floor(Math.random() * symbols.length)]
+        });
+      }
+    }
+
+    document.getElementById('btn-confetti').addEventListener('click', () => {
+      spawnBurst(window.innerWidth * 0.3, window.innerHeight * 0.4, 20);
+      spawnBurst(window.innerWidth * 0.7, window.innerHeight * 0.4, 20);
+    });
+    document.getElementById('airplay-btn').addEventListener('click', () => {
+      spawnBurst(window.innerWidth * 0.5, window.innerHeight * 0.45, 22);
+    });
+
+    // Greeting Modal Logic
+    const modal = document.getElementById('modal-backdrop');
+    const openModalBtns = [
+      document.getElementById('cta-open-card'),
+      document.getElementById('nav-letter')
+    ];
+    openModalBtns.forEach(btn => btn.addEventListener('click', () => {
+      modal.classList.add('open');
+      spawnBurst(window.innerWidth / 2, window.innerHeight / 2, 24);
+    }));
+    document.getElementById('modal-close').addEventListener('click', () => {
+      modal.classList.remove('open');
+    });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('open');
+    });
+    document.getElementById('modal-play-chorus').addEventListener('click', () => {
+      modal.classList.remove('open');
+      audio.currentTime = 30;
+      if (audio.paused) togglePlay();
+    });
+
+    // Main Animation Loop (Beat Analysis + Parallax + Particles)
+    function animate(now) {
+      requestAnimationFrame(animate);
+
+      // Smooth parallax interpolation
+      currentX += (mouseX - currentX) * 0.07;
+      currentY += (mouseY - currentY) * 0.07;
+
+      // Audio frequency beat detection
+      let beatIntensity = 0;
+      if (!audio.paused) {
+        if (isAudioSetup && analyser) {
+          analyser.getByteFrequencyData(dataArray);
+          // Bass bins (0..8)
+          let sum = 0;
+          for (let i = 0; i < 8; i++) sum += dataArray[i];
+          beatIntensity = Math.min(1, Math.max(0, (sum / (8 * 255) - 0.35) * 2.1));
+
+          // Update equalizer bars on album cover
+          eqBars.forEach((bar, idx) => {
+            const val = dataArray[idx * 3 + 1] || 40;
+            bar.style.height = Math.max(4, (val / 255) * 16) + 'px';
+          });
+
+          // Wave animation on background "ЛЕНИНГРАД" letters
+          titleChars.forEach((ch, idx) => {
+            const bin = dataArray[(idx * 2) % 24] / 255;
+            const yOff = -bin * (turboMode ? 26 : 14);
+            ch.style.transform = `translateY(${yOff.toFixed(1)}px)`;
+          });
+        } else {
+          // Fallback rhythmic pulse if audio context is restricted
+          beatIntensity = (Math.sin(now * 0.012) * 0.5 + 0.5) * 0.65;
+        }
+
+        if (turboMode) beatIntensity = Math.min(1.35, beatIntensity * 1.45);
+        document.documentElement.style.setProperty('--beat-glow', beatIntensity.toFixed(3));
+
+        // Ambiently spawn floating notes on strong beats
+        if (beatIntensity > 0.62 && Math.random() < (turboMode ? 0.35 : 0.14)) {
+          const rx = window.innerWidth * (0.2 + Math.random() * 0.6);
+          const ry = window.innerHeight * (0.3 + Math.random() * 0.4);
+          spawnBurst(rx, ry, 2);
+        }
+      } else {
+        titleChars.forEach((ch) => {
+          ch.style.transform = 'translateY(0px)';
+        });
+      }
+
+      // Apply 3D parallax to scattered mini-cabriolets
+      cabrios.forEach((cab, idx) => {
+        const depth = parseFloat(cab.getAttribute('data-depth') || 20);
+        const px = -currentX * depth;
+        const py = -currentY * depth;
+        cab.style.transform = `translate3d(${px.toFixed(1)}px, ${py.toFixed(1)}px, 0)`;
+      });
+
+      // Render particles
+      ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.06; // light gravity
+        p.rot += p.vRot;
+        p.alpha -= 0.016;
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx2d.save();
+        ctx2d.globalAlpha = Math.max(0, p.alpha);
+        ctx2d.translate(p.x, p.y);
+        ctx2d.rotate(p.rot);
+        ctx2d.font = `${p.size}px sans-serif`;
+        ctx2d.textAlign = 'center';
+        ctx2d.textBaseline = 'middle';
+        ctx2d.fillText(p.symbol, 0, 0);
+        ctx2d.restore();
+      }
+    }
+
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
